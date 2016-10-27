@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ "$1" = "-t" ]
+then
+	echo "charge moyenne 1 minute"
+else
+	echo $( cat /proc/loadavg | sed -e "s/ .*$//" )
+fi
+
+exit 0

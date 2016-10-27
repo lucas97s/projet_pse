@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ "$1" = "-t" ]
+then
+	echo "nombre d'utilisateurs"
+else
+	echo $(who | sed -e "s/ .*$//" | sort -u | wc -l)
+fi
+
+exit 0

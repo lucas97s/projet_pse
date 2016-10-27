@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ "$1" = "-t" ]
+then
+	echo "nombre de processus"
+else
+	echo $( ls /proc/ | grep -E "^[0-9]+$" | sort -u | wc -w )
+fi
+
+exit 0

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ "$1" = "-t" ]
+then
+	echo "mémoire utilisée"
+else
+	echo $( cat /proc/meminfo | grep "Active:" | grep -oE "[0-9]+" )
+fi
+
+exit 0
