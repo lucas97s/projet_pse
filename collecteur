@@ -5,11 +5,6 @@ INTERVALLE=60
 REP_S=sondes
 REP_M=mesures
 
-if [ $# -eq 0 ]
-then
-	echo "usage : $0 [-n nb] [-i duree] [-s rep_sondes] [-m rep_mesures] sonde1 sonde2 ..." >&2
-	exit 1
-fi
 
 while getopts "n:i:s:m:" option
 do
@@ -29,9 +24,16 @@ do
 	esac
 done
 
-INTER=$( echo "$INTERVALLE" | grep -oE "^[0-9]*h*[0-9]*m*[0-9]*s*$" | cat )
 
-if [ -n "$INTER" ]
+if [ $# -eq 0 ]
+then
+	echo "usage : $0 [-n nb] [-i duree] [-s rep_sondes] [-m rep_mesures] sonde1 sonde2 ..." >&2
+	exit 1
+fi
+
+
+TEST=$( echo $INTERVALLE | grep -o "[hms]" | cat )
+if [ "$TEST" != "" ]
 then
 	HEURES=$( echo "$INTERVALLE" | grep -oE '[0-9]+h' | sed 's/h//' | cat )
 	if [ "$HEURES" = "" ]
@@ -48,9 +50,28 @@ then
 	INTERVALLE=$(( \( $HEURES \* 3600 \) + \( $MINUTES \* 60 \) + $SECONDES ))
 fi
 
-echo $NB
-echo $INTERVALLE
-echo $REP_S
-echo $REP_M
+if [ ! -d $REP_M ]
+then 
+	mkdir $REP_M
+fi
+
+for SONDE in $*
+do
+	touch $REP_M/$SONDE
+	echo "# $SONDE" $( hostname ) > $REP_M/$SONDE
+done
+
+COMPTEUR=0
+
+while [ $COMPTEUR -lt $NB ]
+do
+	for SONDE in $*
+	do
+		echo "$( date +%Y-%m-%d\ %H:%M:%S )	$( $REP_S/$SONDE )" >> $REP_M/$SONDE
+	done
+	sleep $INTERVALLE
+	COMPTEUR=$(( $COMPTEUR + 1 ))
+done
+
 
 exit 0
