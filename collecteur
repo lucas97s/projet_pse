@@ -1,0 +1,56 @@
+#!/bin/sh
+
+NB=10
+INTERVALLE=60
+REP_S=sondes
+REP_M=mesures
+
+if [ $# -eq 0 ]
+then
+	echo "usage : $0 [-n nb] [-i duree] [-s rep_sondes] [-m rep_mesures] sonde1 sonde2 ..." >&2
+	exit 1
+fi
+
+while getopts "n:i:s:m:" option
+do
+	case $option in
+		n)
+			NB=$OPTARG
+			shift;shift;;
+		i)
+			INTERVALLE=$OPTARG 
+			shift;shift;;
+		s)
+			REP_S=$OPTARG 
+			shift;shift;;
+		m)
+			REP_M=$OPTARG 
+			shift;shift;;
+	esac
+done
+
+INTER=$( echo "$INTERVALLE" | grep -oE "^[0-9]*h*[0-9]*m*[0-9]*s*$" | cat )
+
+if [ -n "$INTER" ]
+then
+	HEURES=$( echo "$INTERVALLE" | grep -oE '[0-9]+h' | sed 's/h//' | cat )
+	if [ "$HEURES" = "" ]
+	then HEURES=0
+	fi
+	MINUTES=$( echo "$INTERVALLE" | grep -oE '[0-9]+m' | sed 's/m//' | cat )
+	if [ "$MINUTES" = "" ]
+	then MINUTES=0
+	fi
+	SECONDES=$( echo "$INTERVALLE" | grep -oE '[0-9]+s' | sed 's/s//' | cat )
+	if [ "$SECONDES" = "" ]
+	then SECONDES=0
+	fi
+	INTERVALLE=$(( \( $HEURES \* 3600 \) + \( $MINUTES \* 60 \) + $SECONDES ))
+fi
+
+echo $NB
+echo $INTERVALLE
+echo $REP_S
+echo $REP_M
+
+exit 0
