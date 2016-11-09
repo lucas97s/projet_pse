@@ -1,0 +1,13 @@
+#!/bin/sh
+
+
+while getopts "o" option
+do
+	case $option in
+		o)
+			FICHIER_OUT=$OPTARG
+			shift;shift;;
+	esac
+done
+
+
