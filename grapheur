@@ -1,5 +1,17 @@
 #!/bin/sh
 
+trap "rm -f /tmp/*_$$" EXIT
+
+FICHIER1=$1
+SONDE1=$( cat $FICHIER1 | sed -n '1p' | sed -e "s/^# //" | cat )
+FICHIER2=$2
+SONDE2=$( cat $FICHIER2 | sed -n '1p' | sed -e "s/^# //" | cat )
+
+if [ -z "$FICHIER1" ]
+then
+	echo "usage: $0 [-o fichier-pdf] fichier1 [fichier2]" >&2
+	exit 1
+fi
 
 while getopts "o" option
 do
@@ -11,3 +23,31 @@ do
 done
 
 
+cat > /tmp/plot_instructions_$$ << 'fin_plot_instructions'
+set xdata time
+set timefmt "%Y-%m-%d %H:%M:%S"
+set datafile separator "\t"
+set format x "%Y-%m-%d %H:%M:%S"
+set xtics rotate
+fin_plot_instructions
+
+
+if [ -n "$FICHIER_OUT" ]
+then
+	echo "set terminal pdfcairo" >> /tmp/plot_instructions_$$ 
+	echo "set output \"$FICHIER_OUT\"" >> /tmp/plot_instructions_$$
+fi
+
+echo "set ylabel \"$SONDE1\"" >> /tmp/plot_instructions_$$
+echo "plot \"$FICHIER1\" u 1:2 w l axes x1y1 title \"$SONDE1\"" >> /tmp/plot_instructions_$$
+
+if [ -n "$FICHIER2" ]
+then
+	echo "set y2tics nomirror" >> /tmp/plot_instructions_$$
+	echo "set y2label \"$SONDE2\"" >> /tmp/plot_instructions_$$
+	echo "replot \"$FICHIER2\" u 1:2 w l axes x1y2 title \"$SONDE2\"" >> /tmp/plot_instructions_$$
+fi
+
+gnuplot -p < /tmp/plot_instructions_$$
+
+exit 0

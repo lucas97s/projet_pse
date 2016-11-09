@@ -58,7 +58,7 @@ fi
 for SONDE in $*
 do
 	touch $REP_M/$SONDE
-	echo "# $SONDE" $( hostname ) > $REP_M/$SONDE
+	echo "# $( $REP_S/$SONDE -t ) / $( hostname )" > $REP_M/$SONDE
 done
 
 COMPTEUR=0
