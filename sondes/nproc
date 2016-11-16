@@ -3,6 +3,9 @@
 if [ "$1" = "-t" ]
 then
 	echo "nombre de processus en cours"
+elif [ "$1" = "-y" ]
+then
+	echo "jauge"
 else
 	echo $( ls /proc/ | grep -E "^[0-9]+$" | sort -u | wc -w )
 fi

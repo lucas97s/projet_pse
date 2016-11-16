@@ -55,19 +55,31 @@ then
 	mkdir $REP_M
 fi
 
+
 for SONDE in $*
 do
 	touch $REP_M/$SONDE
-	echo "# $( $REP_S/$SONDE -t ) / $( hostname )" > $REP_M/$SONDE
+	if [ $( REP_S/$SONDE ) = "jauge" ]
+	then
+		echo "# $( $REP_S/$SONDE -t ) / $( hostname )" > $REP_M/$SONDE
+	else
+		echo "# $( $REP_S/$SONDE -t ) par seconde / $( hostname )" > $REP_M/$SONDE
+	fi
+
 done
 
-COMPTEUR=0
 
+COMPTEUR=0
 while [ $COMPTEUR -lt $NB ]
 do
 	for SONDE in $*
 	do
-		echo "$( date +%Y-%m-%d\ %H:%M:%S )	$( $REP_S/$SONDE )" >> $REP_M/$SONDE
+		if [ $( $REP_S/$SONDE ) = "jauge" ]
+		then
+			echo "$( date +%Y-%m-%d\ %H:%M:%S )	$( $REP_S/$SONDE )" >> $REP_M/$SONDE
+		else
+			echo "$( date +%Y-%m-%d\ %H:%M:%S )	$(( \( $M2 - $M1 \) / $INTERVALLE ))" >> $REP_M/$SONDE
+		fi
 	done
 	sleep $INTERVALLE
 	COMPTEUR=$(( $COMPTEUR + 1 ))

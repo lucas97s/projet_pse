@@ -3,6 +3,9 @@
 if [ "$1" = "-t" ]
 then
 	echo "mémoire utilisée"
+elif [ "$1" = "-y" ]
+then
+	echo "jauge"
 else
 	echo $( cat /proc/meminfo | grep "Active:" | grep -oE "[0-9]+" )
 fi

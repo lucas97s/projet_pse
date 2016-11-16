@@ -1,0 +1,21 @@
+#!/bin/sh
+
+trap "rm -f /tmp/*_$$" EXIT
+
+if [ "$1" = "-t" ]
+then
+	echo "nombre de paquets reseau recus"
+elif [ "$1" = "-y" ]
+then
+	echo "compteur"
+else
+	cat /proc/net/dev | sed -r -e "1d; 2d" | awk '{print $3}' > /tmp/paquets_$$
+	TOTALE=0
+	for NOMBRE in $( cat /tmp/paquets_$$ )
+	do
+		TOTALE=$(( $TOTALE + $NOMBRE ))
+	done
+	echo $TOTALE
+fi
+
+exit 0
